@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Black Hole Star Field</title>
+    <title>Six Point Ventures - Cosmic Playground</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
         #canvas { background: black; cursor: none; }
@@ -59,15 +59,17 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
+        let celestialObjects = [];
         let mouse = { x: 0, y: 0 };
 
         const settings = {
-            starCount: 1500,
+            starCount: 2000,
             minStarSize: 0.5,
             maxStarSize: 2,
-            blackHoleRadius: 50,
-            gravitationalPull: 0.15,
-            starSpeed: 0.5
+            blackHoleRadius: 100,
+            gravitationalPull: 0.3,
+            starSpeed: 0.5,
+            celestialObjectChance: 0.001
         };
 
         function resizeCanvas() {
@@ -79,15 +81,33 @@
         function createStars() {
             stars = [];
             for (let i = 0; i < settings.starCount; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * (settings.maxStarSize - settings.minStarSize) + settings.minStarSize,
-                    speed: Math.random() * settings.starSpeed + 0.1,
-                    angle: Math.random() * Math.PI * 2,
-                    twinkle: Math.random()
-                });
+                stars.push(createStar());
             }
+        }
+
+        function createStar() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * (settings.maxStarSize - settings.minStarSize) + settings.minStarSize,
+                speed: Math.random() * settings.starSpeed + 0.1,
+                angle: Math.random() * Math.PI * 2,
+                twinkle: Math.random()
+            };
+        }
+
+        function createCelestialObject() {
+            const types = ['meteor', 'comet', 'planet'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: type === 'planet' ? 10 + Math.random() * 20 : 2 + Math.random() * 4,
+                speed: type === 'planet' ? 0.2 : 2 + Math.random() * 3,
+                angle: Math.random() * Math.PI * 2,
+                type: type,
+                color: type === 'planet' ? `hsl(${Math.random() * 360}, 70%, 50%)` : 'white'
+            };
         }
 
         function updateAndDrawStars() {
@@ -109,12 +129,11 @@
 
                 if (distance < settings.blackHoleRadius) {
                     // Star is inside the black hole, reset its position
-                    star.x = Math.random() * canvas.width;
-                    star.y = Math.random() * canvas.height;
+                    Object.assign(star, createStar());
                 } else {
                     // Calculate gravitational pull
                     const force = settings.gravitationalPull / (distance * distance);
-                    star.angle = Math.atan2(dy, dx) + Math.PI / 2;
+                    star.angle = Math.atan2(dy, dx);
                     star.speed += force;
 
                     // Move star
@@ -139,6 +158,32 @@
                 ctx.arc(star.x, star.y, star.size * twinkle, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
                 ctx.fill();
+            });
+
+            // Update and draw celestial objects
+            if (Math.random() < settings.celestialObjectChance) {
+                celestialObjects.push(createCelestialObject());
+            }
+
+            celestialObjects = celestialObjects.filter(obj => {
+                obj.x += Math.cos(obj.angle) * obj.speed;
+                obj.y += Math.sin(obj.angle) * obj.speed;
+
+                ctx.beginPath();
+                ctx.arc(obj.x, obj.y, obj.size, 0, Math.PI * 2);
+                ctx.fillStyle = obj.color;
+                ctx.fill();
+
+                if (obj.type === 'comet') {
+                    ctx.beginPath();
+                    ctx.moveTo(obj.x, obj.y);
+                    ctx.lineTo(obj.x - Math.cos(obj.angle) * 20, obj.y - Math.sin(obj.angle) * 20);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+
+                return obj.x > 0 && obj.x < canvas.width && obj.y > 0 && obj.y < canvas.height;
             });
 
             requestAnimationFrame(updateAndDrawStars);
