@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Cosmic Playground</title>
+    <title>Six Point Ventures - Neural Network Visualization</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
-        #canvas { background: black; cursor: none; }
+        #canvas { background: #000033; cursor: none; }
         .center-text {
             position: absolute;
             top: 30%;
@@ -16,8 +16,8 @@
             color: white;
             pointer-events: none;
         }
-        .center-text h1 { font-size: 4rem; margin-bottom: 0.5rem; }
-        .center-text p { font-size: 1.5rem; margin-bottom: 2rem; }
+        .center-text h1 { font-size: 4rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .center-text p { font-size: 1.5rem; margin-bottom: 2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
         .categories {
             position: absolute;
             bottom: 10%;
@@ -32,14 +32,14 @@
             cursor: pointer;
             padding: 15px 30px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             transition: all 0.5s ease;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             box-shadow: 0 0 20px rgba(255,255,255,0.3);
         }
         .category:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-10px);
         }
     </style>
@@ -48,7 +48,7 @@
     <canvas id="canvas"></canvas>
     <div class="center-text">
         <h1>Six Point Ventures</h1>
-        <p>Smart Money into Smart Founders</p>
+        <p>Smart Money Into The Smartest Founders</p>
     </div>
     <div class="categories">
         <div class="category" id="future-proofing">Future Proofing</div>
@@ -58,135 +58,131 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
-        let celestialObjects = [];
+        let nodes = [];
         let mouse = { x: 0, y: 0 };
 
         const settings = {
-            starCount: 2000,
-            minStarSize: 0.5,
-            maxStarSize: 2,
-            blackHoleRadius: 100,
-            gravitationalPull: 0.3,
-            starSpeed: 0.5,
-            celestialObjectChance: 0.001
+            nodeCount: 100,
+            connectionDistance: 150,
+            nodeSize: 3,
+            nodeSpeed: 0.5,
+            pulseSpeed: 0.02,
+            dataPacketSpeed: 2
         };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            createStars();
+            createNodes();
         }
 
-        function createStars() {
-            stars = [];
-            for (let i = 0; i < settings.starCount; i++) {
-                stars.push(createStar());
+        function createNodes() {
+            nodes = [];
+            for (let i = 0; i < settings.nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * settings.nodeSpeed,
+                    vy: (Math.random() - 0.5) * settings.nodeSpeed,
+                    connections: [],
+                    pulsePhase: Math.random() * Math.PI * 2
+                });
             }
         }
 
-        function createStar() {
-            return {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * (settings.maxStarSize - settings.minStarSize) + settings.minStarSize,
-                speed: Math.random() * settings.starSpeed + 0.1,
-                angle: Math.random() * Math.PI * 2,
-                twinkle: Math.random()
-            };
+        function drawNode(node, size, color) {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
         }
 
-        function createCelestialObject() {
-            const types = ['meteor', 'comet', 'planet'];
-            const type = types[Math.floor(Math.random() * types.length)];
-            return {
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: type === 'planet' ? 10 + Math.random() * 20 : 2 + Math.random() * 4,
-                speed: type === 'planet' ? 0.2 : 2 + Math.random() * 3,
-                angle: Math.random() * Math.PI * 2,
-                type: type,
-                color: type === 'planet' ? `hsl(${Math.random() * 360}, 70%, 50%)` : 'white'
-            };
+        function drawConnection(node1, node2, strength) {
+            ctx.beginPath();
+            ctx.moveTo(node1.x, node1.y);
+            ctx.lineTo(node2.x, node2.y);
+            ctx.strokeStyle = `rgba(100, 200, 255, ${strength})`;
+            ctx.lineWidth = strength * 2;
+            ctx.stroke();
         }
 
-        function updateAndDrawStars() {
+        function drawDataPacket(start, end, progress) {
+            const x = start.x + (end.x - start.x) * progress;
+            const y = start.y + (end.y - start.y) * progress;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fill();
+        }
+
+        function updateAndDrawNetwork() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw black hole
-            const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, settings.blackHoleRadius);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(mouse.x, mouse.y, settings.blackHoleRadius, 0, Math.PI * 2);
-            ctx.fill();
+            // Update node positions and find connections
+            nodes.forEach(node => {
+                node.x += node.vx;
+                node.y += node.vy;
+                node.pulsePhase += settings.pulseSpeed;
 
-            stars.forEach(star => {
-                const dx = mouse.x - star.x;
-                const dy = mouse.y - star.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+                // Bounce off edges
+                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
 
-                if (distance < settings.blackHoleRadius) {
-                    // Star is inside the black hole, reset its position
-                    Object.assign(star, createStar());
-                } else {
-                    // Calculate gravitational pull
-                    const force = settings.gravitationalPull / (distance * distance);
-                    star.angle = Math.atan2(dy, dx);
-                    star.speed += force;
-
-                    // Move star
-                    star.x += Math.cos(star.angle) * star.speed;
-                    star.y += Math.sin(star.angle) * star.speed;
-
-                    // Slow down star
-                    star.speed *= 0.99;
-
-                    // Wrap around screen edges
-                    if (star.x < 0) star.x = canvas.width;
-                    if (star.x > canvas.width) star.x = 0;
-                    if (star.y < 0) star.y = canvas.height;
-                    if (star.y > canvas.height) star.y = 0;
-                }
-
-                // Twinkling effect
-                star.twinkle += 0.05;
-                const twinkle = Math.sin(star.twinkle) * 0.3 + 0.7;
-
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size * twinkle, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
-                ctx.fill();
+                node.connections = nodes.filter(otherNode => {
+                    if (node === otherNode) return false;
+                    const dx = node.x - otherNode.x;
+                    const dy = node.y - otherNode.y;
+                    return Math.sqrt(dx * dx + dy * dy) < settings.connectionDistance;
+                });
             });
 
-            // Update and draw celestial objects
-            if (Math.random() < settings.celestialObjectChance) {
-                celestialObjects.push(createCelestialObject());
-            }
+            // Draw connections
+            nodes.forEach(node => {
+                node.connections.forEach(connectedNode => {
+                    const dx = node.x - connectedNode.x;
+                    const dy = node.y - connectedNode.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const strength = 1 - distance / settings.connectionDistance;
+                    drawConnection(node, connectedNode, strength);
 
-            celestialObjects = celestialObjects.filter(obj => {
-                obj.x += Math.cos(obj.angle) * obj.speed;
-                obj.y += Math.sin(obj.angle) * obj.speed;
+                    // Randomly send data packets
+                    if (Math.random() < 0.001) {
+                        const packet = { start: node, end: connectedNode, progress: 0 };
+                        node.dataPacket = packet;
+                    }
+                });
+            });
 
-                ctx.beginPath();
-                ctx.arc(obj.x, obj.y, obj.size, 0, Math.PI * 2);
-                ctx.fillStyle = obj.color;
-                ctx.fill();
+            // Draw nodes and data packets
+            nodes.forEach(node => {
+                const pulseSize = Math.sin(node.pulsePhase) * 2 + settings.nodeSize;
+                drawNode(node, pulseSize, 'rgba(100, 200, 255, 0.8)');
 
-                if (obj.type === 'comet') {
+                if (node.dataPacket) {
+                    drawDataPacket(node.dataPacket.start, node.dataPacket.end, node.dataPacket.progress);
+                    node.dataPacket.progress += settings.dataPacketSpeed / 100;
+                    if (node.dataPacket.progress > 1) {
+                        node.dataPacket = null;
+                    }
+                }
+            });
+
+            // Draw mouse interaction
+            nodes.forEach(node => {
+                const dx = mouse.x - node.x;
+                const dy = mouse.y - node.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 100) {
                     ctx.beginPath();
-                    ctx.moveTo(obj.x, obj.y);
-                    ctx.lineTo(obj.x - Math.cos(obj.angle) * 20, obj.y - Math.sin(obj.angle) * 20);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                    ctx.lineWidth = 2;
+                    ctx.moveTo(mouse.x, mouse.y);
+                    ctx.lineTo(node.x, node.y);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.lineWidth = 1;
                     ctx.stroke();
                 }
-
-                return obj.x > 0 && obj.x < canvas.width && obj.y > 0 && obj.y < canvas.height;
             });
 
-            requestAnimationFrame(updateAndDrawStars);
+            requestAnimationFrame(updateAndDrawNetwork);
         }
 
         window.addEventListener('resize', resizeCanvas);
@@ -196,7 +192,7 @@
         });
 
         resizeCanvas();
-        updateAndDrawStars();
+        updateAndDrawNetwork();
     </script>
 </body>
 </html>
