@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Neural Network Visualization</title>
+    <title>Six Point Ventures - Interactive Neural Network</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
         #canvas { background: #000033; cursor: none; }
@@ -24,11 +24,12 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            justify-content: center;
-            gap: 2rem;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
         .category {
-            font-size: 1.8rem;
+            font-size: 2rem;
             cursor: pointer;
             padding: 15px 30px;
             border-radius: 10px;
@@ -37,6 +38,11 @@
             transition: all 0.5s ease;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            width: 300px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .category:hover {
             background: rgba(255, 255, 255, 0.2);
@@ -51,148 +57,12 @@
         <p>Smart Money Into The Smartest Founders</p>
     </div>
     <div class="categories">
-        <div class="category" id="future-proofing">Future Proofing</div>
-        <div class="category" id="next-gen-digital">Next Gen Digital</div>
-        <div class="category" id="re-imagine-world">Re-Imagine The World</div>
+        <div class="category" id="future-proofing">Future<br>Proofing</div>
+        <div class="category" id="next-gen-digital">Next Gen<br>Digital</div>
+        <div class="category" id="re-imagine-world">Re-Imagine<br>The World</div>
     </div>
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let nodes = [];
-        let mouse = { x: 0, y: 0 };
-
-        const settings = {
-            nodeCount: 100,
-            connectionDistance: 150,
-            nodeSize: 3,
-            nodeSpeed: 0.5,
-            pulseSpeed: 0.02,
-            dataPacketSpeed: 2
-        };
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            createNodes();
-        }
-
-        function createNodes() {
-            nodes = [];
-            for (let i = 0; i < settings.nodeCount; i++) {
-                nodes.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * settings.nodeSpeed,
-                    vy: (Math.random() - 0.5) * settings.nodeSpeed,
-                    connections: [],
-                    pulsePhase: Math.random() * Math.PI * 2
-                });
-            }
-        }
-
-        function drawNode(node, size, color) {
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
-
-        function drawConnection(node1, node2, strength) {
-            ctx.beginPath();
-            ctx.moveTo(node1.x, node1.y);
-            ctx.lineTo(node2.x, node2.y);
-            ctx.strokeStyle = `rgba(100, 200, 255, ${strength})`;
-            ctx.lineWidth = strength * 2;
-            ctx.stroke();
-        }
-
-        function drawDataPacket(start, end, progress) {
-            const x = start.x + (end.x - start.x) * progress;
-            const y = start.y + (end.y - start.y) * progress;
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fill();
-        }
-
-        function updateAndDrawNetwork() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Update node positions and find connections
-            nodes.forEach(node => {
-                node.x += node.vx;
-                node.y += node.vy;
-                node.pulsePhase += settings.pulseSpeed;
-
-                // Bounce off edges
-                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
-
-                node.connections = nodes.filter(otherNode => {
-                    if (node === otherNode) return false;
-                    const dx = node.x - otherNode.x;
-                    const dy = node.y - otherNode.y;
-                    return Math.sqrt(dx * dx + dy * dy) < settings.connectionDistance;
-                });
-            });
-
-            // Draw connections
-            nodes.forEach(node => {
-                node.connections.forEach(connectedNode => {
-                    const dx = node.x - connectedNode.x;
-                    const dy = node.y - connectedNode.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const strength = 1 - distance / settings.connectionDistance;
-                    drawConnection(node, connectedNode, strength);
-
-                    // Randomly send data packets
-                    if (Math.random() < 0.001) {
-                        const packet = { start: node, end: connectedNode, progress: 0 };
-                        node.dataPacket = packet;
-                    }
-                });
-            });
-
-            // Draw nodes and data packets
-            nodes.forEach(node => {
-                const pulseSize = Math.sin(node.pulsePhase) * 2 + settings.nodeSize;
-                drawNode(node, pulseSize, 'rgba(100, 200, 255, 0.8)');
-
-                if (node.dataPacket) {
-                    drawDataPacket(node.dataPacket.start, node.dataPacket.end, node.dataPacket.progress);
-                    node.dataPacket.progress += settings.dataPacketSpeed / 100;
-                    if (node.dataPacket.progress > 1) {
-                        node.dataPacket = null;
-                    }
-                }
-            });
-
-            // Draw mouse interaction
-            nodes.forEach(node => {
-                const dx = mouse.x - node.x;
-                const dy = mouse.y - node.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 100) {
-                    ctx.beginPath();
-                    ctx.moveTo(mouse.x, mouse.y);
-                    ctx.lineTo(node.x, node.y);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            });
-
-            requestAnimationFrame(updateAndDrawNetwork);
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        canvas.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        resizeCanvas();
-        updateAndDrawNetwork();
+        // ... (keep the existing JavaScript code)
     </script>
 </body>
 </html>
