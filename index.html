@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Six Point Ventures - Black Hole Star Field</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
         #canvas { background: black; cursor: none; }
         .center-text {
             position: absolute;
@@ -14,18 +14,37 @@
             transform: translate(-50%, -50%);
             text-align: center;
             color: white;
-            font-family: Arial, sans-serif;
             pointer-events: none;
         }
         .center-text h1 { font-size: 4rem; margin-bottom: 0.5rem; }
-        .center-text p { font-size: 1.5rem; }
+        .center-text p { font-size: 1.5rem; margin-bottom: 2rem; }
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .category {
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        #future-proofing:hover { background: rgba(255, 0, 0, 0.3); transform: scale(1.1); }
+        #next-gen-digital:hover { background: rgba(0, 255, 0, 0.3); transform: rotate(5deg); }
+        #re-imagine-world:hover { background: rgba(0, 0, 255, 0.3); box-shadow: 0 0 15px rgba(0, 0, 255, 0.5); }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     <div class="center-text">
         <h1>Six Point Ventures</h1>
-        <p>Smart Money into Smart Founders</p>
+        <p>Smart Money Bets on Tomorrow's Opportunities</p>
+        <div class="categories">
+            <div class="category" id="future-proofing">Future Proofing</div>
+            <div class="category" id="next-gen-digital">Next Gen Digital</div>
+            <div class="category" id="re-imagine-world">Re-Imagine The World</div>
+        </div>
     </div>
     <script>
         const canvas = document.getElementById('canvas');
