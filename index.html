@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Interactive Tech Fund Showcase</title>
+    <title>Six Point Ventures - Interactive Neural Network</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
         #canvas { background: #000033; cursor: none; }
@@ -54,29 +54,6 @@
             color: rgba(255, 255, 255, 0.8);
             pointer-events: none;
         }
-        #portfolio {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-        }
-        #portfolio h3 {
-            margin-top: 0;
-        }
-        #portfolio ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        #portfolio li {
-            cursor: pointer;
-            margin-bottom: 5px;
-        }
-        #portfolio li:hover {
-            color: #00ffff;
-        }
         #quantum-visual {
             position: absolute;
             bottom: 10px;
@@ -97,19 +74,146 @@
     </div>
     <div id="floating-data"></div>
     <div id="prediction"></div>
-    <div id="portfolio">
-        <h3>Our Portfolio</h3>
-        <ul>
-            <li>AI Innovators Inc.</li>
-            <li>Quantum Leap Tech</li>
-            <li>BlockChain Pioneers</li>
-            <li>NextGen Robotics</li>
-            <li>Sustainable Energy Solutions</li>
-        </ul>
-    </div>
     <canvas id="quantum-visual"></canvas>
     <script>
-        // ... (keep the existing JavaScript for the neural network)
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+        let mouse = { x: 0, y: 0 };
+
+        const settings = {
+            nodeCount: 150,
+            connectionDistance: 150,
+            nodeSize: 3,
+            nodeSpeed: 0.5,
+            pulseSpeed: 0.02,
+            dataPacketSpeed: 2,
+            attractionRadius: 200,
+            repulsionRadius: 50
+        };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createNodes();
+        }
+
+        function createNodes() {
+            nodes = [];
+            for (let i = 0; i < settings.nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * settings.nodeSpeed,
+                    vy: (Math.random() - 0.5) * settings.nodeSpeed,
+                    connections: [],
+                    pulsePhase: Math.random() * Math.PI * 2,
+                    color: `hsl(${Math.random() * 60 + 180}, 100%, 50%)`
+                });
+            }
+        }
+
+        function drawNode(node, size, color) {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawConnection(node1, node2, strength) {
+            ctx.beginPath();
+            ctx.moveTo(node1.x, node1.y);
+            ctx.lineTo(node2.x, node2.y);
+            ctx.strokeStyle = `rgba(100, 200, 255, ${strength})`;
+            ctx.lineWidth = strength * 2;
+            ctx.stroke();
+        }
+
+        function drawDataPacket(start, end, progress) {
+            const x = start.x + (end.x - start.x) * progress;
+            const y = start.y + (end.y - start.y) * progress;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fill();
+        }
+
+        function updateAndDrawNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            nodes.forEach(node => {
+                const dx = mouse.x - node.x;
+                const dy = mouse.y - node.y;
+                const distanceToMouse = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distanceToMouse < settings.attractionRadius) {
+                    const force = (settings.attractionRadius - distanceToMouse) / settings.attractionRadius;
+                    node.vx += dx / distanceToMouse * force * 0.1;
+                    node.vy += dy / distanceToMouse * force * 0.1;
+                } else if (distanceToMouse < settings.repulsionRadius) {
+                    const force = (settings.repulsionRadius - distanceToMouse) / settings.repulsionRadius;
+                    node.vx -= dx / distanceToMouse * force * 0.2;
+                    node.vy -= dy / distanceToMouse * force * 0.2;
+                }
+
+                node.x += node.vx;
+                node.y += node.vy;
+                node.pulsePhase += settings.pulseSpeed;
+
+                node.vx *= 0.99;
+                node.vy *= 0.99;
+
+                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+
+                node.connections = nodes.filter(otherNode => {
+                    if (node === otherNode) return false;
+                    const dx = node.x - otherNode.x;
+                    const dy = node.y - otherNode.y;
+                    return Math.sqrt(dx * dx + dy * dy) < settings.connectionDistance;
+                });
+            });
+
+            nodes.forEach(node => {
+                node.connections.forEach(connectedNode => {
+                    const dx = node.x - connectedNode.x;
+                    const dy = node.y - connectedNode.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const strength = 1 - distance / settings.connectionDistance;
+                    drawConnection(node, connectedNode, strength);
+
+                    if (Math.random() < 0.001) {
+                        const packet = { start: node, end: connectedNode, progress: 0 };
+                        node.dataPacket = packet;
+                    }
+                });
+            });
+
+            nodes.forEach(node => {
+                const pulseSize = Math.sin(node.pulsePhase) * 2 + settings.nodeSize;
+                drawNode(node, pulseSize, node.color);
+
+                if (node.dataPacket) {
+                    drawDataPacket(node.dataPacket.start, node.dataPacket.end, node.dataPacket.progress);
+                    node.dataPacket.progress += settings.dataPacketSpeed / 100;
+                    if (node.dataPacket.progress > 1) {
+                        node.dataPacket = null;
+                    }
+                }
+            });
+
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, settings.attractionRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, settings.repulsionRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+            ctx.stroke();
+
+            requestAnimationFrame(updateAndDrawNetwork);
+        }
 
         // Dynamic Data Visualization
         function createFloatingData() {
@@ -210,19 +314,19 @@
             document.body.style.backgroundColor = `hsl(${hue}, 50%, 10%)`;
         }
 
-        // Initialize all features
+        window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        resizeCanvas();
+        updateAndDrawNetwork();
         createFloatingData();
         showPrediction();
         drawQuantumCircuit();
         adaptUI();
         setInterval(adaptUI, 60000); // Check for UI updates every minute
-
-        // Interactive Portfolio
-        document.querySelectorAll('#portfolio li').forEach(item => {
-            item.addEventListener('click', () => {
-                alert(`Investing in ${item.textContent} - A leader in cutting-edge technology`);
-            });
-        });
     </script>
 </body>
 </html>
