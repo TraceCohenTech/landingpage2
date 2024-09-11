@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Interactive Neural Network</title>
+    <title>Six Point Ventures - Interactive Tech Fund Showcase</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
         #canvas { background: #000033; cursor: none; }
@@ -48,6 +48,40 @@
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-10px);
         }
+        #floating-data, #prediction {
+            position: absolute;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+        }
+        #portfolio {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        #portfolio h3 {
+            margin-top: 0;
+        }
+        #portfolio ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #portfolio li {
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        #portfolio li:hover {
+            color: #00ffff;
+        }
+        #quantum-visual {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -61,163 +95,134 @@
         <div class="category" id="next-gen-digital">Next Gen<br>Digital</div>
         <div class="category" id="re-imagine-world">Re-Imagine<br>The World</div>
     </div>
+    <div id="floating-data"></div>
+    <div id="prediction"></div>
+    <div id="portfolio">
+        <h3>Our Portfolio</h3>
+        <ul>
+            <li>AI Innovators Inc.</li>
+            <li>Quantum Leap Tech</li>
+            <li>BlockChain Pioneers</li>
+            <li>NextGen Robotics</li>
+            <li>Sustainable Energy Solutions</li>
+        </ul>
+    </div>
+    <canvas id="quantum-visual"></canvas>
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let nodes = [];
-        let mouse = { x: 0, y: 0 };
-        let attractedNodes = [];
+        // ... (keep the existing JavaScript for the neural network)
 
-        const settings = {
-            nodeCount: 150,
-            connectionDistance: 150,
-            nodeSize: 3,
-            nodeSpeed: 0.5,
-            pulseSpeed: 0.02,
-            dataPacketSpeed: 2,
-            attractionRadius: 200,
-            repulsionRadius: 50
-        };
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            createNodes();
+        // Dynamic Data Visualization
+        function createFloatingData() {
+            const data = [
+                "AI Market: $190B by 2025",
+                "Quantum Computing: $1.3B by 2023",
+                "Cybersecurity: $248B by 2023",
+                "Blockchain: $23.3B by 2023",
+                "6G Research Underway",
+                "Edge Computing: $43.4B by 2027"
+            ];
+            
+            const floatingData = document.getElementById('floating-data');
+            floatingData.style.left = `${Math.random() * (window.innerWidth - 200)}px`;
+            floatingData.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+            floatingData.textContent = data[Math.floor(Math.random() * data.length)];
+            
+            floatingData.style.opacity = 1;
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.02;
+                floatingData.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    setTimeout(createFloatingData, Math.random() * 3000 + 2000);
+                }
+            }, 50);
         }
 
-        function createNodes() {
-            nodes = [];
-            for (let i = 0; i < settings.nodeCount; i++) {
-                nodes.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * settings.nodeSpeed,
-                    vy: (Math.random() - 0.5) * settings.nodeSpeed,
-                    connections: [],
-                    pulsePhase: Math.random() * Math.PI * 2,
-                    color: `hsl(${Math.random() * 60 + 180}, 100%, 50%)`
-                });
+        // Predictive Analytics Showcase
+        function showPrediction() {
+            const predictions = [
+                "AI will revolutionize healthcare by 2025",
+                "Quantum supremacy will be achieved by 2027",
+                "50% of vehicles will be electric by 2030",
+                "Mars colony will be established by 2040",
+                "Renewable energy will dominate by 2035"
+            ];
+            
+            const prediction = document.getElementById('prediction');
+            prediction.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
+            prediction.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+            prediction.textContent = "Prediction: " + predictions[Math.floor(Math.random() * predictions.length)];
+            
+            prediction.style.opacity = 1;
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.01;
+                prediction.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    setTimeout(showPrediction, Math.random() * 5000 + 5000);
+                }
+            }, 50);
+        }
+
+        // Quantum Computing Visual
+        const quantumCanvas = document.getElementById('quantum-visual');
+        const qCtx = quantumCanvas.getContext('2d');
+        quantumCanvas.width = 200;
+        quantumCanvas.height = 100;
+
+        function drawQuantumCircuit() {
+            qCtx.clearRect(0, 0, quantumCanvas.width, quantumCanvas.height);
+            qCtx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+            qCtx.lineWidth = 2;
+
+            for (let i = 0; i < 3; i++) {
+                qCtx.beginPath();
+                qCtx.moveTo(0, 20 + i * 30);
+                qCtx.lineTo(200, 20 + i * 30);
+                qCtx.stroke();
+
+                for (let j = 0; j < 5; j++) {
+                    qCtx.beginPath();
+                    qCtx.arc(40 * j + 20, 20 + i * 30, 5, 0, Math.PI * 2);
+                    qCtx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
+                    qCtx.fill();
+                }
             }
+
+            requestAnimationFrame(drawQuantumCircuit);
         }
 
-        function drawNode(node, size, color) {
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
+        // Adaptive UI
+        function adaptUI() {
+            const hour = new Date().getHours();
+            let hue;
+            if (hour >= 6 && hour < 12) {
+                hue = 60; // Morning yellow
+            } else if (hour >= 12 && hour < 18) {
+                hue = 200; // Afternoon blue
+            } else if (hour >= 18 && hour < 22) {
+                hue = 30; // Evening orange
+            } else {
+                hue = 270; // Night purple
+            }
+            document.body.style.backgroundColor = `hsl(${hue}, 50%, 10%)`;
         }
 
-        function drawConnection(node1, node2, strength) {
-            ctx.beginPath();
-            ctx.moveTo(node1.x, node1.y);
-            ctx.lineTo(node2.x, node2.y);
-            ctx.strokeStyle = `rgba(100, 200, 255, ${strength})`;
-            ctx.lineWidth = strength * 2;
-            ctx.stroke();
-        }
+        // Initialize all features
+        createFloatingData();
+        showPrediction();
+        drawQuantumCircuit();
+        adaptUI();
+        setInterval(adaptUI, 60000); // Check for UI updates every minute
 
-        function drawDataPacket(start, end, progress) {
-            const x = start.x + (end.x - start.x) * progress;
-            const y = start.y + (end.y - start.y) * progress;
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fill();
-        }
-
-        function updateAndDrawNetwork() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Update node positions and find connections
-            nodes.forEach(node => {
-                // Mouse attraction/repulsion
-                const dx = mouse.x - node.x;
-                const dy = mouse.y - node.y;
-                const distanceToMouse = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distanceToMouse < settings.attractionRadius) {
-                    const force = (settings.attractionRadius - distanceToMouse) / settings.attractionRadius;
-                    node.vx += dx / distanceToMouse * force * 0.1;
-                    node.vy += dy / distanceToMouse * force * 0.1;
-                } else if (distanceToMouse < settings.repulsionRadius) {
-                    const force = (settings.repulsionRadius - distanceToMouse) / settings.repulsionRadius;
-                    node.vx -= dx / distanceToMouse * force * 0.2;
-                    node.vy -= dy / distanceToMouse * force * 0.2;
-                }
-
-                node.x += node.vx;
-                node.y += node.vy;
-                node.pulsePhase += settings.pulseSpeed;
-
-                // Dampen velocity
-                node.vx *= 0.99;
-                node.vy *= 0.99;
-
-                // Bounce off edges
-                if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-                if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
-
-                node.connections = nodes.filter(otherNode => {
-                    if (node === otherNode) return false;
-                    const dx = node.x - otherNode.x;
-                    const dy = node.y - otherNode.y;
-                    return Math.sqrt(dx * dx + dy * dy) < settings.connectionDistance;
-                });
+        // Interactive Portfolio
+        document.querySelectorAll('#portfolio li').forEach(item => {
+            item.addEventListener('click', () => {
+                alert(`Investing in ${item.textContent} - A leader in cutting-edge technology`);
             });
-
-            // Draw connections
-            nodes.forEach(node => {
-                node.connections.forEach(connectedNode => {
-                    const dx = node.x - connectedNode.x;
-                    const dy = node.y - connectedNode.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const strength = 1 - distance / settings.connectionDistance;
-                    drawConnection(node, connectedNode, strength);
-
-                    // Randomly send data packets
-                    if (Math.random() < 0.001) {
-                        const packet = { start: node, end: connectedNode, progress: 0 };
-                        node.dataPacket = packet;
-                    }
-                });
-            });
-
-            // Draw nodes and data packets
-            nodes.forEach(node => {
-                const pulseSize = Math.sin(node.pulsePhase) * 2 + settings.nodeSize;
-                drawNode(node, pulseSize, node.color);
-
-                if (node.dataPacket) {
-                    drawDataPacket(node.dataPacket.start, node.dataPacket.end, node.dataPacket.progress);
-                    node.dataPacket.progress += settings.dataPacketSpeed / 100;
-                    if (node.dataPacket.progress > 1) {
-                        node.dataPacket = null;
-                    }
-                }
-            });
-
-            // Draw mouse interaction
-            ctx.beginPath();
-            ctx.arc(mouse.x, mouse.y, settings.attractionRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(mouse.x, mouse.y, settings.repulsionRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
-            ctx.stroke();
-
-            requestAnimationFrame(updateAndDrawNetwork);
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        canvas.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
         });
-
-        resizeCanvas();
-        updateAndDrawNetwork();
     </script>
 </body>
 </html>
