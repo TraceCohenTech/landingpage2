@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Six Point Ventures - Dot Grid</title>
+    <title>Six Point Ventures - Star Field</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
         #canvas { background: black; }
@@ -30,60 +30,62 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let dots = [];
+        let stars = [];
         let mouse = { x: 0, y: 0 };
 
         const settings = {
-            dotSize: 1.5,
-            dotSpacing: 30,
+            starCount: 1000,
+            minStarSize: 0.5,
+            maxStarSize: 2,
             mouseBoundingArea: 100,
-            dotInertia: 0.1
+            starInertia: 0.05
         };
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            createDots();
+            createStars();
         }
 
-        function createDots() {
-            dots = [];
-            const numCols = Math.floor(canvas.width / settings.dotSpacing);
-            const numRows = Math.floor(canvas.height / settings.dotSpacing);
-
-            for (let i = 0; i < numRows; i++) {
-                for (let j = 0; j < numCols; j++) {
-                    dots.push({
-                        x: j * settings.dotSpacing,
-                        y: i * settings.dotSpacing,
-                        originalX: j * settings.dotSpacing,
-                        originalY: i * settings.dotSpacing
-                    });
-                }
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < settings.starCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * (settings.maxStarSize - settings.minStarSize) + settings.minStarSize,
+                    originalX: Math.random() * canvas.width,
+                    originalY: Math.random() * canvas.height,
+                    twinkle: Math.random()
+                });
             }
         }
 
-        function updateAndDrawDots() {
+        function updateAndDrawStars() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ffffff';
 
-            dots.forEach(dot => {
-                const distX = mouse.x - dot.originalX;
-                const distY = mouse.y - dot.originalY;
+            stars.forEach(star => {
+                const distX = mouse.x - star.originalX;
+                const distY = mouse.y - star.originalY;
                 const distance = Math.sqrt(distX * distX + distY * distY);
                 const force = Math.max(0, settings.mouseBoundingArea - distance) / settings.mouseBoundingArea;
-                const targetX = dot.originalX + distX * force * 2; // Increased movement
-                const targetY = dot.originalY + distY * force * 2; // Increased movement
+                const targetX = star.originalX + distX * force * 2;
+                const targetY = star.originalY + distY * force * 2;
 
-                dot.x += (targetX - dot.x) * settings.dotInertia;
-                dot.y += (targetY - dot.y) * settings.dotInertia;
+                star.x += (targetX - star.x) * settings.starInertia;
+                star.y += (targetY - star.y) * settings.starInertia;
+
+                // Twinkling effect
+                star.twinkle += 0.02;
+                const twinkle = Math.sin(star.twinkle) * 0.3 + 0.7;
 
                 ctx.beginPath();
-                ctx.arc(dot.x, dot.y, settings.dotSize, 0, Math.PI * 2);
+                ctx.arc(star.x, star.y, star.size * twinkle, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
                 ctx.fill();
             });
 
-            requestAnimationFrame(updateAndDrawDots);
+            requestAnimationFrame(updateAndDrawStars);
         }
 
         window.addEventListener('resize', resizeCanvas);
@@ -93,7 +95,7 @@
         });
 
         resizeCanvas();
-        updateAndDrawDots();
+        updateAndDrawStars();
     </script>
 </body>
 </html>
