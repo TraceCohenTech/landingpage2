@@ -18,35 +18,16 @@
         }
         .center-text h1 { font-size: 4rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .center-text p { font-size: 1.5rem; margin-bottom: 2rem; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
-        .categories {
+        .large-text {
             position: absolute;
-            bottom: 10%;
+            bottom: 20%;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-        .category {
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 15px 30px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.5s ease;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            box-shadow: 0 0 20px rgba(255,255,255,0.3);
-            width: 300px;
             text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .category:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-10px);
+            color: white;
+            font-size: 1.5rem;
+            width: 90%;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         #floating-data, #prediction {
             position: absolute;
@@ -54,10 +35,42 @@
             color: rgba(255, 255, 255, 0.8);
             pointer-events: none;
         }
-        #quantum-visual {
+        .hacker-mode {
+            font-family: 'Courier New', monospace;
+            color: #00ff00 !important;
+            text-shadow: 0 0 5px #00ff00 !important;
+        }
+        .hacker-mode #canvas {
+            filter: hue-rotate(120deg) saturate(200%);
+        }
+        .hacker-mode::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.15),
+                rgba(0, 255, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        .konami-code {
             position: absolute;
             bottom: 10px;
-            left: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -67,14 +80,12 @@
         <h1>Six Point Ventures</h1>
         <p>Smart Money Into The Smartest Founders</p>
     </div>
-    <div class="categories">
-        <div class="category" id="future-proofing">Future<br>Proofing</div>
-        <div class="category" id="next-gen-digital">Next Gen<br>Digital</div>
-        <div class="category" id="re-imagine-world">Re-Imagine<br>The World</div>
+    <div class="large-text">
+        "With a proven track record as experienced operators and investors in over 100 startups, we’ve earned the trust and admiration of founders by truly caring about their success, leading to multiple liquidity events for all involved."
     </div>
     <div id="floating-data"></div>
     <div id="prediction"></div>
-    <canvas id="quantum-visual"></canvas>
+    <div class="konami-code">Konami Code: ↑↑↓↓←→←→BA</div>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -82,14 +93,14 @@
         let mouse = { x: 0, y: 0 };
 
         const settings = {
-            nodeCount: 120,
-            connectionDistance: 175,
-            nodeSize: 2,
-            nodeSpeed: 1.2,
-            pulseSpeed: 0.5,
+            nodeCount: 150,
+            connectionDistance: 150,
+            nodeSize: 3,
+            nodeSpeed: 0.5,
+            pulseSpeed: 0.02,
             dataPacketSpeed: 2,
-            attractionRadius: 250,
-            repulsionRadius: 100
+            attractionRadius: 200,
+            repulsionRadius: 50
         };
 
         function resizeCanvas() {
@@ -215,14 +226,13 @@
             requestAnimationFrame(updateAndDrawNetwork);
         }
 
-        // Dynamic Data Visualization
         function createFloatingData() {
             const data = [
-                "Brain-Computer Interfaces (BCI)",
+                "AI Market: $190B by 2025",
                 "Quantum Computing: $1.3B by 2023",
                 "Cybersecurity: $248B by 2023",
-                "Nanotechnology in Medicine and Manufacturing",
-                "Biodegradable Electronics and Materials",
+                "Blockchain: $23.3B by 2023",
+                "6G Research Underway",
                 "Edge Computing: $43.4B by 2027"
             ];
             
@@ -243,7 +253,6 @@
             }, 50);
         }
 
-        // Predictive Analytics Showcase
         function showPrediction() {
             const predictions = [
                 "AI will revolutionize healthcare by 2025",
@@ -270,50 +279,6 @@
             }, 50);
         }
 
-        // Quantum Computing Visual
-        const quantumCanvas = document.getElementById('quantum-visual');
-        const qCtx = quantumCanvas.getContext('2d');
-        quantumCanvas.width = 200;
-        quantumCanvas.height = 100;
-
-        function drawQuantumCircuit() {
-            qCtx.clearRect(0, 0, quantumCanvas.width, quantumCanvas.height);
-            qCtx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
-            qCtx.lineWidth = 2;
-
-            for (let i = 0; i < 3; i++) {
-                qCtx.beginPath();
-                qCtx.moveTo(0, 20 + i * 30);
-                qCtx.lineTo(200, 20 + i * 30);
-                qCtx.stroke();
-
-                for (let j = 0; j < 5; j++) {
-                    qCtx.beginPath();
-                    qCtx.arc(40 * j + 20, 20 + i * 30, 5, 0, Math.PI * 2);
-                    qCtx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 255, 0, 0.5)';
-                    qCtx.fill();
-                }
-            }
-
-            requestAnimationFrame(drawQuantumCircuit);
-        }
-
-        // Adaptive UI
-        function adaptUI() {
-            const hour = new Date().getHours();
-            let hue;
-            if (hour >= 6 && hour < 12) {
-                hue = 60; // Morning yellow
-            } else if (hour >= 12 && hour < 18) {
-                hue = 200; // Afternoon blue
-            } else if (hour >= 18 && hour < 22) {
-                hue = 30; // Evening orange
-            } else {
-                hue = 270; // Night purple
-            }
-            document.body.style.backgroundColor = `hsl(${hue}, 50%, 10%)`;
-        }
-
         window.addEventListener('resize', resizeCanvas);
         canvas.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
@@ -324,9 +289,25 @@
         updateAndDrawNetwork();
         createFloatingData();
         showPrediction();
-        drawQuantumCircuit();
-        adaptUI();
-        setInterval(adaptUI, 60000); // Check for UI updates every minute
+
+        // Hacker Mode Easter Egg
+        let konami = [];
+        const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // Up, Up, Down, Down, Left, Right, Left, Right, B, A
+
+        document.addEventListener('keydown', (e) => {
+            konami.push(e.keyCode);
+            konami = konami.slice(-10);
+            
+            if (konami.join(',') === konamiCode.join(',')) {
+                document.body.classList.toggle('hacker-mode');
+                
+                if (document.body.classList.contains('hacker-mode')) {
+                    alert("Hacker mode activated. Email trace@sixpoint.vc for funding!");
+                } else {
+                    alert("Hacker mode deactivated. Goodbye, n00b!");
+                }
+            }
+        });
     </script>
 </body>
 </html>
