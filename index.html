@@ -82,14 +82,14 @@
         let mouse = { x: 0, y: 0 };
 
         const settings = {
-            nodeCount: 150,
+            nodeCount: 200,
             connectionDistance: 150,
-            nodeSize: 3,
-            nodeSpeed: 0.5,
-            pulseSpeed: 0.02,
-            dataPacketSpeed: 2,
-            attractionRadius: 200,
-            repulsionRadius: 50
+            nodeSize: 4,
+            nodeSpeed: 1,
+            pulseSpeed: 0.5,
+            dataPacketSpeed: 3,
+            attractionRadius: 300,
+            repulsionRadius: 100
         };
 
         function resizeCanvas() {
@@ -218,11 +218,11 @@
         // Dynamic Data Visualization
         function createFloatingData() {
             const data = [
-                "AI Market: $190B by 2025",
+                "Brain-Computer Interfaces (BCI)",
                 "Quantum Computing: $1.3B by 2023",
                 "Cybersecurity: $248B by 2023",
-                "Blockchain: $23.3B by 2023",
-                "6G Research Underway",
+                "Nanotechnology in Medicine and Manufacturing",
+                "Biodegradable Electronics and Materials",
                 "Edge Computing: $43.4B by 2027"
             ];
             
